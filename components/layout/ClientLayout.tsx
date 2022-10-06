@@ -9,7 +9,7 @@ interface ClientLayoutProps {
 const ClientLayout: React.FunctionComponent<ClientLayoutProps> = (props) => {
   const { Content } = Layout;
   return (
-    <Layout>
+    <Layout className="layout-client">
       <Header />
       <Content>{props.children}</Content>
       <Footer />

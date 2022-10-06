@@ -1,0 +1,21 @@
+.ant-layout {
+  &-has-sider {
+    min-height: 100vh;
+
+    .ant-layout {
+      padding: 30px;
+    }
+  }
+  .ant-card {
+    min-height: 92vh;
+    border-radius: 10px;
+  }
+}
+
+.layout-client {
+  min-height: 100vh;
+
+  .ant-layout-footer {
+    background-color: #001529;
+  }
+}

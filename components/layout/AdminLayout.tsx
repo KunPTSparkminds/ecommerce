@@ -1,9 +1,10 @@
-import { Layout } from "antd";
+import { Card, Layout } from "antd";
 import * as React from "react";
-import Sider from "../attribute/Sider";
+import Sider from "../adminLayout/Sider";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  title: string;
 }
 
 const AdminLayout: React.FunctionComponent<AdminLayoutProps> = (props) => {
@@ -12,7 +13,9 @@ const AdminLayout: React.FunctionComponent<AdminLayoutProps> = (props) => {
     <Layout hasSider>
       <Sider />
       <Layout>
-        <Content>{props.children}</Content>
+        <Card title={props.title} bordered={false}>
+          <Content>{props.children}</Content>
+        </Card>
       </Layout>
     </Layout>
   );
