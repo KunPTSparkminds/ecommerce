@@ -6,7 +6,8 @@ interface LoginProps {}
 
 const Login: React.FunctionComponent<LoginProps> = (props) => {
   const router = useRouter();
-  const [jwt, setJWT] = useState<string>();
+  const [jwt, setJWT] = useState<{ jwtToken: string }>();
+  console.log("check jwt", jwt);
   const onFinish = async (values: any) => {
     const obj = JSON.parse(JSON.stringify(values));
     const formData = new FormData();
@@ -31,6 +32,7 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
     if (jwt) {
       router.push("/");
       localStorage.setItem("isLoggedIn", jwt ? "true" : "false");
+      localStorage.setItem("jwt", jwt.jwtToken);
     }
   }, [jwt]);
   return (

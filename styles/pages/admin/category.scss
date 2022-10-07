@@ -1,0 +1,76 @@
+.category {
+  &__title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .add-news {
+      cursor: pointer;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+
+      background-color: #1d86e4;
+      padding: 10px;
+      border-radius: 8px;
+
+      & > span {
+        &:first-child {
+          font-size: 1rem;
+          color: #fff;
+
+          position: relative;
+          top: 1px;
+        }
+        &:last-child {
+          color: #fff;
+          font-size: 1rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+  &__table {
+    .ant-table {
+      tbody {
+        & > tr {
+          & > td {
+            .group-actions {
+              & > .ant-btn {
+                min-width: 70px;
+                height: 40px;
+                border-radius: 8px;
+                border: none;
+                margin: 0 10px;
+                .anticon {
+                  font-size: 20px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.modal-category {
+  .ant-modal-content {
+    .ant-modal-footer {
+      display: none;
+    }
+    .ant-modal-body {
+      .modal-create {
+        .button-submit {
+          width: 100px;
+          height: 40px;
+          border-radius: 8px;
+          margin: 0 auto;
+          span {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+}

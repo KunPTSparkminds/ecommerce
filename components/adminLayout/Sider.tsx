@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Breadcrumb, Layout, Menu } from "antd";
+import Link from "next/link";
 import React, { useState } from "react";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -17,24 +18,41 @@ function getItem(
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
-  children?: MenuItem[]
+  children?: MenuItem[],
+  onTitleClick?: any
 ): MenuItem {
   return {
     key,
     icon,
     children,
     label,
+    onTitleClick,
   } as MenuItem;
 }
 
 const items: MenuItem[] = [
-  getItem("Dashboard", "1", <PieChartOutlined />),
-  getItem("Category", "2", <DesktopOutlined />),
-  getItem("Product", "sub1", <UserOutlined />, [
-    getItem("Tom", "3"),
-    getItem("Bill", "4"),
-    getItem("Alex", "5"),
-  ]),
+  getItem(
+    <Link href={"/admin"}>
+      <a>Dashboard</a>
+    </Link>,
+    "1",
+    <PieChartOutlined />
+  ),
+  getItem(
+    <Link href="/admin/category">
+      <a>Category</a>
+    </Link>,
+    "2",
+    <DesktopOutlined />
+  ),
+  getItem(
+    <Link href="/admin/product">
+      <a>Product</a>
+    </Link>,
+    "sub1",
+    <UserOutlined />,
+    [getItem("Tom", "3"), getItem("Bill", "4"), getItem("Alex", "5")]
+  ),
   getItem("Team", "sub2", <TeamOutlined />, [
     getItem("Team 1", "6"),
     getItem("Team 2", "8"),
