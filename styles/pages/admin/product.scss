@@ -30,4 +30,26 @@
       }
     }
   }
+  &__table {
+    .ant-table {
+      tbody {
+        & > tr {
+          & > td {
+            .group-actions {
+              & > .ant-btn {
+                min-width: 70px;
+                height: 40px;
+                border-radius: 8px;
+                border: none;
+                margin: 0 10px;
+                .anticon {
+                  font-size: 20px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

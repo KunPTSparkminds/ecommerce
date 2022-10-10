@@ -7,23 +7,22 @@ import "react-toastify/dist/ReactToastify.css";
 import AdminLayout from "../components/layout/AdminLayout";
 import ClientLayout from "../components/layout/ClientLayout";
 import "../styles/app.scss";
-interface MyAppProps extends AppProps {
-  title: string;
-}
-function MyApp({ Component, pageProps, title }: MyAppProps) {
+interface MyAppProps extends AppProps {}
+function MyApp({ Component, pageProps }: MyAppProps) {
   const router = useRouter();
 
-  useEffect(() => {
-    const isLoggedIn = localStorage?.getItem("isLoggedIn");
-    if (!isLoggedIn && isLoggedIn === "false") {
-      router.push("/login");
-    }
-  }, []);
+  // useEffect(() => {
+  //   console.log("hello 12344");
+  //   const isLoggedIn = localStorage?.getItem("isLoggedIn");
+  //   if (!isLoggedIn && isLoggedIn === "false") {
+  //     router.push("/login");
+  //   }
+  // }, []);
 
   switch (router?.pathname.includes("/admin")) {
     case true:
       return (
-        <AdminLayout title={title}>
+        <AdminLayout>
           <Component {...pageProps} />
           <ToastContainer />
         </AdminLayout>

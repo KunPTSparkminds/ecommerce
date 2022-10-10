@@ -49,9 +49,8 @@ const items: MenuItem[] = [
     <Link href="/admin/product">
       <a>Product</a>
     </Link>,
-    "sub1",
-    <UserOutlined />,
-    [getItem("Tom", "3"), getItem("Bill", "4"), getItem("Alex", "5")]
+    "3",
+    <UserOutlined />
   ),
   getItem("Team", "sub2", <TeamOutlined />, [
     getItem("Team 1", "6"),

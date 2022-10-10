@@ -1,9 +1,10 @@
-import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Modal, Table } from "antd";
+import { rejects } from "assert";
 import date from "date-and-time";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import ModalCreate from "../../components/admin/Category/ModalCreate";
 import { DATE_TIME_FORMAT } from "../../consts";
@@ -12,7 +13,6 @@ import { Category } from "../../models";
 interface CategoryProps {}
 const Category: React.FunctionComponent<CategoryProps> = (props) => {
   const router = useRouter();
-  console.log(router.query);
   const [form] = Form.useForm();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +23,10 @@ const Category: React.FunctionComponent<CategoryProps> = (props) => {
   const [type, setType] = useState<string>();
 
   useEffect(() => {
-    getCategories();
+    if (index) {
+      console.log("in index");
+      getCategories();
+    }
   }, [index]);
 
   const getCategories = async () => {
@@ -34,7 +37,12 @@ const Category: React.FunctionComponent<CategoryProps> = (props) => {
         Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        return Promise.reject(response);
+      })
       .then((data) =>
         setCategory(
           data.map((item: Category) => ({

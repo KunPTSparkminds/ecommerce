@@ -4,18 +4,18 @@ import Sider from "../adminLayout/Sider";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
-  title: string;
 }
 
 const AdminLayout: React.FunctionComponent<AdminLayoutProps> = (props) => {
-  const { Content } = Layout;
+  const { Content, Header } = Layout;
   return (
-    <Layout hasSider>
-      <Sider />
+    <Layout className="layout-admin">
+      <Header>Header</Header>
       <Layout>
-        <Card title={props.title} bordered={false}>
-          <Content>{props.children}</Content>
-        </Card>
+        <Sider />
+        <Content>
+          <Card bordered={false}>{props.children}</Card>
+        </Content>
       </Layout>
     </Layout>
   );

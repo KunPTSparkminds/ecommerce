@@ -1,14 +1,11 @@
-.ant-layout {
-  &-has-sider {
-    min-height: 100vh;
-
-    .ant-layout {
-      padding: 30px;
-    }
-  }
+.layout-admin {
+  min-height: 100vh;
   .ant-card {
-    min-height: 92vh;
+    min-height: 88vh;
     border-radius: 10px;
+  }
+  .ant-layout-content {
+    padding: 20px 30px;
   }
 }
 
