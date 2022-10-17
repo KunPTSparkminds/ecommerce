@@ -1,6 +1,5 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Modal, Table } from "antd";
-import { rejects } from "assert";
 import date from "date-and-time";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -24,7 +23,6 @@ const Category: React.FunctionComponent<CategoryProps> = (props) => {
 
   useEffect(() => {
     if (index) {
-      console.log("in index");
       getCategories();
     }
   }, [index]);

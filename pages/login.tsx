@@ -7,7 +7,7 @@ interface LoginProps {}
 const Login: React.FunctionComponent<LoginProps> = (props) => {
   const router = useRouter();
   const [jwt, setJWT] = useState<{ jwtToken: string }>();
-  console.log("check jwt", jwt);
+
   const onFinish = async (values: any) => {
     const obj = JSON.parse(JSON.stringify(values));
     const formData = new FormData();
@@ -30,11 +30,32 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
 
   useEffect(() => {
     if (jwt) {
-      router.push("/");
+      getUserDetail();
       localStorage.setItem("isLoggedIn", jwt ? "true" : "false");
       localStorage.setItem("jwt", jwt.jwtToken);
     }
   }, [jwt]);
+
+  const getUserDetail = async () => {
+    await fetch("http://localhost:8081/api/user-detail", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Access-Control-Allow-Credentials": "true",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.role) {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
+      });
+  };
+
   return (
     <div className="login auth-page">
       <div className="login__form auth-form">

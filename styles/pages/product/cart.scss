@@ -1,0 +1,133 @@
+.cart {
+  padding: 60px 200px;
+  &__options {
+    span {
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: red;
+    }
+  }
+  &__table {
+    .ant-table {
+      thead {
+        tr {
+          & > th {
+            font-size: 16px;
+            color: #454545;
+            font-weight: 600;
+          }
+        }
+      }
+      tbody {
+        & > tr {
+          & > td {
+            color: #454545;
+            font-size: 14px;
+            font-weight: 500;
+
+            .anticon-delete {
+              cursor: pointer;
+              font-size: 22px;
+            }
+          }
+        }
+      }
+    }
+    .ant-pagination {
+      display: none;
+    }
+  }
+  &__total {
+    text-align: right;
+    padding: 20px 0;
+
+    .total {
+      display: flex;
+      gap: 10px;
+      justify-content: end;
+      span {
+        font-size: 24px;
+        color: #454545;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.ant-popover {
+  &-content {
+    box-shadow: 5px 10px 18px #888888;
+    .mini-cart {
+      max-height: 300px;
+      overflow-y: scroll;
+
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      /* Track */
+      &::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px grey;
+        border-radius: 10px;
+      }
+
+      /* Handle */
+      &::-webkit-scrollbar-thumb {
+        background: grey;
+        border-radius: 10px;
+      }
+      &__wrap {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        padding: 5px;
+        &__product {
+          & > span {
+            color: #414141;
+            font-weight: 600;
+          }
+          .price {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+      }
+      .total {
+        padding: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        & > span {
+          &:first-child {
+            font-weight: 600;
+            color: #454545;
+            font-size: 20px;
+          }
+          &:last-child {
+            font-size: 16px;
+            color: #414141;
+            font-weight: 500;
+          }
+        }
+      }
+      .view-cart {
+        .ant-btn {
+          width: 100%;
+          background-color: #909090;
+          &:hover,
+          &:focus,
+          &:active {
+            border-color: #ffffff;
+          }
+          span {
+            color: #ffffff;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}

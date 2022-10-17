@@ -1,6 +1,6 @@
 .auth-page {
   height: 100%;
-  margin-top: 150px;
+  padding: 150px 0;
   .auth-form {
     padding: 50px 100px;
     width: fit-content;
@@ -9,7 +9,7 @@
     border-radius: 10px;
     background: white;
 
-    box-shadow: 5px 10px 8px #888888;
+    box-shadow: 4px 5px 26px 8px #888888;
     .button-submit {
       text-align: center;
 

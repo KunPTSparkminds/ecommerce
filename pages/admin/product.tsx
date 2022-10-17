@@ -8,32 +8,53 @@ import { DATE_TIME_FORMAT } from "../../consts";
 import ModalCreate from "../../components/admin/Product/ModalCreate";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { TableCommon } from "../../shared/Table/TableCommon";
 interface ProductProps {}
+interface DataFilter {
+  page: number;
+}
+
+const initialFilter: DataFilter = {
+  page: 0,
+};
 
 const Product: React.FunctionComponent<ProductProps> = (props) => {
   const router = useRouter();
+
   const [form] = Form.useForm();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [products, setProducts] = useState<Product[]>([]);
   const [index, setIndex] = useState<number>(Math.random());
+  const [totalRecord, setTotalRecord] = useState<number>();
   const [optionsCategory, setOptionsCategory] =
     useState<{ key: number; label: string }[]>();
+
   const [productDetail, setProductDetail] = useState<Product>();
+  const [page, setPage] = useState<number>(0);
   const [base64String, setBase64String] = useState<string>();
   const [type, setType] = useState<string>();
 
+  const [dataFilter, setDataFilter] = useState<DataFilter>(initialFilter);
   useEffect(() => {
     getProducts();
-  }, [index]);
+  }, [index, page]);
 
   useEffect(() => {
-    if (type === "update") {
+    if (type === "update" || type === "add-new") {
       getCategories();
     }
   }, [type]);
 
   const columns = useMemo(
     () => [
+      {
+        title: "No",
+        dataIndex: "no",
+        key: "no",
+        align: "center" as "center",
+      },
       {
         title: "ID",
         dataIndex: "id",
@@ -129,7 +150,12 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
   );
 
   const getProducts = async () => {
-    await fetch("http://localhost:8081/api/product", {
+    let url = new URL("http://localhost:8081/api/product");
+    const cloneDataFilter: any = { ...dataFilter };
+    for (let k in cloneDataFilter) {
+      url.searchParams.append(k, cloneDataFilter[k]);
+    }
+    await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -138,15 +164,17 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
       },
     })
       .then((response) => {
-        console.log("hello bro", response.headers.get("x-total-count"));
-        response.headers.forEach(function (val, key) {
-          console.log(key + " -> " + val);
-        });
+        if (response?.headers?.get("x-total-count")) {
+          setTotalRecord(
+            parseInt(response.headers.get("x-total-count") as string)
+          );
+        }
         return response.json();
       })
       .then((data) =>
         setProducts(
-          data.map((item: Product) => ({
+          data.map((item: Product, index: number) => ({
+            no: index + 1,
             id: item.id,
             name: item.name,
             description: item.description,
@@ -295,7 +323,10 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
       }
     });
   };
-
+  const handleChangePage = async (page: number) => {
+    setPage(page);
+    setDataFilter({ ...dataFilter, page: page - 1 });
+  };
   return (
     <>
       <Modal
@@ -317,15 +348,26 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
       <div className="product">
         <div className="product__title">
           <h1 className="page__title">Products</h1>
-          <div className="add-news">
+          <div
+            className="add-news"
+            onClick={() => {
+              setIsModalOpen(!isModalOpen);
+              setType("add-new");
+            }}
+          >
             <PlusOutlined />
-            <span onClick={() => setIsModalOpen(!isModalOpen)}>
-              Add Product
-            </span>
+            <span>Add Product</span>
           </div>
         </div>
         <div className="product__table">
-          <Table dataSource={products || []} columns={columns} />
+          <TableCommon
+            columns={columns}
+            dataSource={products}
+            onChange={handleChangePage}
+            showTotal
+            total={totalRecord || 0}
+            currentPage={page || 1}
+          />
         </div>
       </div>
     </>
