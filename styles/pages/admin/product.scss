@@ -53,3 +53,25 @@
     }
   }
 }
+
+.ant-modal-root {
+  .ant-modal-wrap {
+    .ant-modal {
+      .ant-modal-content {
+        .ant-modal-footer {
+          display: none;
+        }
+        .ant-modal-body {
+          .modal-create {
+            .button-submit {
+              .ant-btn {
+                width: 100%;
+                height: 40px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

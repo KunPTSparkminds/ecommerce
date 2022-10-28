@@ -44,3 +44,85 @@
     }
   }
 }
+
+.products {
+  padding: 50px 0;
+  display: flex;
+  &__filter {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    min-width: 300px;
+    &__form {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .select-champ,
+      .select-price {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        & > span {
+          font-weight: 600;
+
+          color: #606060;
+        }
+      }
+    }
+  }
+  &__items {
+    flex: 5;
+    &__value {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 50px;
+      &__info {
+        cursor: pointer;
+        & > span {
+          img {
+            transition: transform 0.8s ease;
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+        .price {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          justify-content: center;
+          align-items: center;
+
+          & > span {
+            color: #606060;
+            text-transform: uppercase;
+            &:first-child {
+              font-weight: 600;
+            }
+            &:last-child {
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+    &__pagination {
+      padding: 40px 0;
+      text-align: center;
+    }
+  }
+}
+
+.ant-select-dropdown {
+  .rc-virtual-list {
+    .ant-select-item {
+      .ant-select-item-option-content {
+        font-weight: 500;
+        color: #606060;
+      }
+    }
+  }
+}

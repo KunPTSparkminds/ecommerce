@@ -1,16 +1,20 @@
-import { Button, InputNumber, Modal } from "antd";
-import { InferGetServerSidePropsType } from "next";
+import { Modal } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ApiHelper } from "../../apis/apiHelper";
+import { useAppDispatch } from "../../hooks/hooks";
 import { Product } from "../../models";
+import { setStep } from "../../redux/slice/cartSlice";
 
 interface SectionOneProps {
   listProduct: Product[];
   luffyProduct: Product[];
   zoroProduct: Product[];
   chopperProduct: Product[];
+  sanjiProduct: Product[];
+  namiProduct: Product[];
 }
 
 const SectionOne: React.FunctionComponent<SectionOneProps> = ({
@@ -18,7 +22,10 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
   luffyProduct,
   chopperProduct,
   zoroProduct,
+  sanjiProduct,
+  namiProduct,
 }) => {
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<number>(0);
   const [data, setData] = useState<Product[]>();
@@ -37,6 +44,11 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
       case 3:
         setData(chopperProduct);
         break;
+      case 4:
+        setData(sanjiProduct);
+        break;
+      case 5:
+        setData(namiProduct);
       default:
         break;
     }
@@ -46,19 +58,15 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
     Modal.warning({
       title: "Add item failed",
       content: "Please login to use this function",
+      onOk: () => router.push("/login"),
     });
   };
 
   const handleAddToCart = async (id: number) => {
-    await fetch(`http://localhost:8081/cart/add-item`, {
+    await ApiHelper({
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-      body: JSON.stringify({
+      url: `http://localhost:8081/cart/add-item`,
+      data: JSON.stringify({
         cartId: 1,
         productId: id,
         quantity: 1,
@@ -67,30 +75,31 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
       if (res.status === 401) {
         warning();
       }
-      if (res.ok) {
+      if (res.cartId) {
+        dispatch(setStep(Math.random()));
         toast("Add item to cart successfully", {
           hideProgressBar: true,
           autoClose: 1000,
           type: "success",
         });
-        return res.json();
       }
-      return Promise.reject(res);
     });
   };
 
   return (
     <div className="section-1">
       <div className="section-1__options">
-        {["ALL", "ZORO", "LUFFY", "CHOPPER"].map((item, index) => (
-          <span
-            key={index}
-            className={activeTab === index ? "actived" : ""}
-            onClick={() => setActiveTab(index)}
-          >
-            {item}
-          </span>
-        ))}
+        {["ALL", "ZORO", "LUFFY", "CHOPPER", "SANJI", "NAMI"].map(
+          (item, index) => (
+            <span
+              key={index}
+              className={activeTab === index ? "actived" : ""}
+              onClick={() => setActiveTab(index)}
+            >
+              {item}
+            </span>
+          )
+        )}
       </div>
       <div className="section-1__items">
         {data &&
@@ -113,13 +122,14 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
                   {item.price.toLocaleString("en-US", {
                     style: "currency",
                     currency: "VND",
-                  })}{" "}
+                  })}
                   VND
                 </span>
               </div>
             </div>
           ))}
       </div>
+      <h3 onClick={() => router.push("/products")}>See more</h3>
     </div>
   );
 };

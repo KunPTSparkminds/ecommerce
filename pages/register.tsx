@@ -111,7 +111,7 @@ const RegisterPage: React.FunctionComponent<RegisterPageProps> = (props) => {
           </Form.Item>
         </Form>
         <div className="another-options">
-          <Link href={"#"}>
+          <Link href={"/login"}>
             <a>Already have account?</a>
           </Link>
           <Link href={"#"}>

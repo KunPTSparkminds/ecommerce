@@ -1,12 +1,13 @@
+import { Button, InputNumber, Modal, Rate } from "antd";
+import date from "date-and-time";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
-import { Product } from "../../models";
-import date from "date-and-time";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { DATE_TIME_FORMAT } from "../../consts";
-import { Button, InputNumber, Modal, Rate } from "antd";
-import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { selectStep, setStep } from "../../redux/slice/cartSlice";
+import { useAppDispatch } from "../../hooks/hooks";
+import { Product } from "../../models";
+import { setStep } from "../../redux/slice/cartSlice";
 
 interface ProductDetailProps {}
 
@@ -68,9 +69,12 @@ const ProductDetail: React.FunctionComponent<ProductDetailProps> = (props) => {
       }
       if (res.ok) {
         dispatch(setStep(Math.random()));
-        return res.json();
+        toast("Add item to cart successfully", {
+          hideProgressBar: true,
+          autoClose: 1000,
+          type: "success",
+        });
       }
-      return Promise.reject(res);
     });
   };
   return (

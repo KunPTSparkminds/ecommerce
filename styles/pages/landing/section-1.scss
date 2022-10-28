@@ -9,6 +9,7 @@
       font-weight: 500;
     }
     .actived {
+      border-radius: 8px;
       background-color: #414141;
       color: #ffffff;
     }
@@ -63,5 +64,10 @@
         }
       }
     }
+  }
+  h3 {
+    text-align: center;
+    cursor: pointer;
+    color: rgb(62, 62, 158);
   }
 }

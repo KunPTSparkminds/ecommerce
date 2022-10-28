@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { CartItem } from "../models";
-import date from "date-and-time";
-import { DATE_TIME_FORMAT } from "../consts";
-import { TableCommon } from "../shared/Table/TableCommon";
 import { DeleteOutlined } from "@ant-design/icons";
-import { Table } from "antd";
+import { Button, Table } from "antd";
 import Image from "next/image";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import { useAppDispatch } from "../hooks/hooks";
+import { CartItem } from "../models";
+import { setStep } from "../redux/slice/cartSlice";
 interface CartProps {}
 
 const Cart: React.FunctionComponent<CartProps> = (props) => {
+  const dispatch = useAppDispatch();
   const [data, setData] = useState<CartItem[]>();
   const [index, setIndex] = useState<number>(Math.random());
 
@@ -40,7 +40,6 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
         key: "price",
         align: "center" as "center",
         render: (_: number, values: any) => {
-          console.log(values);
           return (
             <span>
               {(values.price / values.quantity).toLocaleString("en-US", {
@@ -93,6 +92,7 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
     }).then((res) => {
       if (res.status === 204) {
         setIndex(Math.random());
+        dispatch(setStep(Math.random()));
         toast("Delete successfully", {
           hideProgressBar: true,
           autoClose: 1000,
@@ -117,9 +117,33 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
       .then((data) => {
         if (data[0]?.cartId) {
           setData(data);
+        } else {
+          setData([]);
         }
       });
   };
+
+  const handleRemoveAll = async () => {
+    await fetch(`http://localhost:8081/cart?cartId=1`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Access-Control-Allow-Credentials": "true",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    }).then((res) => {
+      if (res.status === 204) {
+        toast("Delete all successfully", {
+          hideProgressBar: true,
+          autoClose: 1000,
+          type: "success",
+        });
+        setIndex(Math.random());
+      }
+    });
+  };
+
   return (
     <div className="cart">
       <div
@@ -129,15 +153,23 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
           padding: "10px",
         }}
       >
-        <span>Remove all</span>
+        <span onClick={() => handleRemoveAll()}>Remove all</span>
       </div>
       <div className="cart__table">
-        <Table columns={columns} dataSource={data} bordered />
+        <Table
+          columns={columns}
+          dataSource={data}
+          bordered
+          pagination={{ pageSize: 999 }}
+        />
       </div>
       <div className="cart__total">
         {data && data.length > 0 && (
           <div className="total">
-            <span>Total</span>
+            <span>{`Total ${data.reduce(
+              (prev, curr) => prev + curr.quantity,
+              0
+            )} items:`}</span>
             <span>
               {data
                 .reduce((prev, curr) => prev + curr.price, 0)
@@ -148,6 +180,9 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
             </span>
           </div>
         )}
+      </div>
+      <div className="cart__btn-checkout">
+        <Button>Checkout</Button>
       </div>
     </div>
   );

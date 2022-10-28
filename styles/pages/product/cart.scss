@@ -53,6 +53,16 @@
       }
     }
   }
+  &__btn-checkout {
+    text-align: right;
+    .ant-btn {
+      background-color: #414141;
+      span {
+        color: #ffffff;
+        font-weight: 600;
+      }
+    }
+  }
 }
 
 .ant-popover {

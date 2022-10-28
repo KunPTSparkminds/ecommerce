@@ -2,18 +2,16 @@ import { Button, Form, Input } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { ApiHelper } from "../apis/apiHelper";
 interface LoginProps {}
 
 const Login: React.FunctionComponent<LoginProps> = (props) => {
   const router = useRouter();
   const [jwt, setJWT] = useState<{ jwtToken: string }>();
 
-  const onFinish = async (values: any) => {
-    const obj = JSON.parse(JSON.stringify(values));
-    const formData = new FormData();
-    formData.append("email", obj.email);
-    formData.append("password", obj.password);
-    await fetch("http://localhost:8081/api/login", {
+  const onFinish = (values: any) => {
+    fetch("http://localhost:8081/api/login", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -22,38 +20,45 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
       },
       body: JSON.stringify(values),
     })
-      .then((response) => {
-        return response.json();
+      .then((res) => {
+        if (!res.ok) throw res;
+        return res.json();
       })
-      .then((data) => setJWT(data));
+      .then((data) => {
+        if (data?.jwtToken) {
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("jwt", data.jwtToken);
+          setJWT(data.jwtToken);
+        }
+      })
+      .catch((error) => {
+        error.json().then((body: any) => {
+          toast(body.message, {
+            hideProgressBar: true,
+            autoClose: 1000,
+            type: "error",
+          });
+        });
+      });
   };
 
   useEffect(() => {
     if (jwt) {
       getUserDetail();
-      localStorage.setItem("isLoggedIn", jwt ? "true" : "false");
-      localStorage.setItem("jwt", jwt.jwtToken);
     }
   }, [jwt]);
 
-  const getUserDetail = async () => {
-    await fetch("http://localhost:8081/api/user-detail", {
+  const getUserDetail = () => {
+    ApiHelper({
+      url: "http://localhost:8081/api/user-detail",
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.role) {
-          router.push("/admin");
-        } else {
-          router.push("/");
-        }
-      });
+    }).then((data) => {
+      if (data?.role) {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
+    });
   };
 
   return (
@@ -62,7 +67,7 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
         <h2>Login</h2>
         <Form
           name="basic"
-          initialValues={{ remember: true }}
+          initialValues={{}}
           onFinish={onFinish}
           autoComplete="off"
           layout="vertical"
@@ -93,7 +98,7 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
           <Link href={"#"}>
             <a>Forget password</a>
           </Link>
-          <Link href={"#"}>
+          <Link href={"/register"}>
             <a>Register now</a>
           </Link>
         </div>
