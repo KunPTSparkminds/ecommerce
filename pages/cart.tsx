@@ -10,6 +10,7 @@ interface CartProps {}
 
 const Cart: React.FunctionComponent<CartProps> = (props) => {
   const dispatch = useAppDispatch();
+
   const [data, setData] = useState<CartItem[]>();
   const [index, setIndex] = useState<number>(Math.random());
 
@@ -80,6 +81,7 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
     ],
     []
   );
+
   const handleDelete = async (id: number) => {
     await fetch(`http://localhost:8081/cart/${id}`, {
       method: "DELETE",
@@ -101,6 +103,7 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
       }
     });
   };
+
   const getItemCart = async () => {
     await fetch(`http://localhost:8081/api/cart/1`, {
       method: "GET",

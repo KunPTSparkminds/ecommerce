@@ -1,8 +1,9 @@
-import * as React from "react";
-import { ApiHelper } from "../../apis/apiHelper";
+import { useRouter } from "next/router";
+import React, { useEffect } from "react";
+import commonApi from "../../apis/commonApi";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import {
-  selectCurrentUser,
+  isLoggedIn,
   setCurrentUser,
   setIsLoggedIn,
 } from "../../redux/slice/authSlice";
@@ -12,23 +13,32 @@ interface LoadUserDetailProps {}
 const LoadUserDetail: React.FunctionComponent<LoadUserDetailProps> = (
   props
 ) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
-  const t = useAppSelector(selectCurrentUser);
-  const getUserDetail = () => {
-    ApiHelper({
-      method: "GET",
-      url: "http://localhost:8081/api/user-detail",
-    }).then((res) => {
-      if (Object.keys(res).length > 0) {
+  const isLogged = useAppSelector(isLoggedIn);
+  useEffect(() => {
+    (async () => {
+      const { body } = await commonApi({
+        method: "GET",
+        url: "http://localhost:8081/api/user-detail",
+      });
+      if (body) {
         dispatch(setIsLoggedIn(true));
-        dispatch(setCurrentUser(res));
+        dispatch(setCurrentUser(body));
+        switch (body.role) {
+          case "ADMIN":
+            if (router.pathname.includes("/admin")) return;
+            router.push("/admin");
+            break;
+          default:
+            if (router.pathname.includes("/admin")) {
+              router.push("/");
+            }
+            break;
+        }
       }
-    });
-  };
-
-  React.useEffect(() => {
-    getUserDetail();
-  }, []);
+    })();
+  }, [isLogged]);
   return <></>;
 };
 

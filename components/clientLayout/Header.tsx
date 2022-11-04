@@ -1,64 +1,68 @@
-import React, { useEffect, useState } from "react";
-import { Button, Input, Layout, Popover } from "antd";
 import {
+  DeleteOutlined,
   SearchOutlined,
   ShoppingCartOutlined,
-  UserAddOutlined,
-  DeleteOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/router";
-import { CartItem } from "../../models";
+import { Button, Input, Layout, Popover } from "antd";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import commonApi from "../../apis/commonApi";
 import { useAppSelector } from "../../hooks/hooks";
+import { CartItem } from "../../models";
+import { isLoggedIn } from "../../redux/slice/authSlice";
 import { selectStep } from "../../redux/slice/cartSlice";
-import { ApiHelper } from "../../apis/apiHelper";
+
 interface HeaderProps {}
 
 const Header: React.FunctionComponent<HeaderProps> = (props) => {
   const { Header } = Layout;
+
   const router = useRouter();
+
   const [data, setData] = useState<CartItem[]>();
   const [error, setError] = useState<{ status: number; title: string }>();
   const [index, setIndex] = useState<number>(Math.random());
-  const resultAddItem = useAppSelector(selectStep);
-  useEffect(() => {
-    getItemCart();
-  }, [index, resultAddItem]);
 
-  const getItemCart = async () => {
-    await ApiHelper({
+  const resultAddItem = useAppSelector(selectStep);
+  const isLogged = useAppSelector(isLoggedIn);
+
+  useEffect(() => {
+    if (isLogged) {
+      getItems();
+    }
+  }, [index, resultAddItem, isLogged]);
+
+  const getItems = async () => {
+    const { body, error } = await commonApi({
       url: "http://localhost:8081/api/cart/1",
       method: "GET",
-    }).then((data) => {
-      if (data?.status === 401) {
-        setError(data);
-      }
-      if (data && data[0]?.cartId) {
-        setData(data);
-      }
     });
+    if (body) {
+      setData(body);
+      setError(undefined);
+    }
+    if (error) {
+      setError(error);
+    }
   };
 
   const handleDelete = async (id: number) => {
-    await fetch(`http://localhost:8081/cart/${id}`, {
+    const { ok } = await commonApi({
+      url: `http://localhost:8081/cart/${id}`,
       method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    }).then((res) => {
-      if (res.status === 204) {
-        setIndex(Math.random());
-        toast("Delete successfully", {
-          hideProgressBar: true,
-          autoClose: 1000,
-          type: "success",
-        });
-      }
     });
+    if (ok) {
+      setIndex(Math.random());
+      toast("Delete successfully", {
+        hideProgressBar: true,
+        autoClose: 1000,
+        type: "success",
+      });
+    }
   };
 
   const handleClickMenu = (item: string) => {
@@ -72,6 +76,15 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
         break;
     }
   };
+  const handleLogOut = async () => {
+    const { ok } = await commonApi({
+      method: "POST",
+      url: "http://localhost:8081/api/logout",
+    });
+    if (ok) {
+      setIndex(Math.random());
+    }
+  };
   return (
     <Header>
       <div className="header__wrap">
@@ -79,11 +92,53 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
           <Input addonAfter={<SearchOutlined />} placeholder="Search here..." />
           <h1>{`Kun's Shop`}</h1>
           <div className="group-icon">
-            <UserAddOutlined />
+            {!isLogged && (
+              <Link href="/login">
+                <a>
+                  <UserOutlined />
+                </a>
+              </Link>
+            )}
+            {isLogged && (
+              <Popover
+                placement="bottom"
+                content={
+                  <div
+                    className="account"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "90px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Link href={"#"}>
+                      <a
+                        style={{
+                          fontSize: "16px",
+                        }}
+                      >
+                        Setting
+                      </a>
+                    </Link>
+                    <span
+                      style={{
+                        fontSize: "16px",
+                      }}
+                      onClick={() => handleLogOut()}
+                    >
+                      Log Out
+                    </span>
+                  </div>
+                }
+              >
+                <UserOutlined />
+              </Popover>
+            )}
             <Popover
               placement="bottom"
               content={
-                error && error.status ? (
+                !isLogged ? (
                   <span>You must be login to use this function</span>
                 ) : (
                   <div className="mini-cart">

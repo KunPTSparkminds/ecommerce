@@ -68,9 +68,17 @@
 .ant-popover {
   &-content {
     box-shadow: 5px 10px 18px #888888;
+    .account {
+      span {
+        &:hover {
+          cursor: pointer;
+          color: #40a9ff;
+        }
+      }
+    }
     .mini-cart {
       max-height: 300px;
-      overflow-y: scroll;
+      overflow-y: auto;
 
       &::-webkit-scrollbar {
         width: 5px;

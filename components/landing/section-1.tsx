@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ApiHelper } from "../../apis/apiHelper";
+import commonApi from "../../apis/commonApi";
 import { useAppDispatch } from "../../hooks/hooks";
 import { Product } from "../../models";
 import { setStep } from "../../redux/slice/cartSlice";
@@ -52,7 +52,15 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
       default:
         break;
     }
-  }, [listProduct, luffyProduct, activeTab, zoroProduct, chopperProduct]);
+  }, [
+    listProduct,
+    luffyProduct,
+    activeTab,
+    zoroProduct,
+    chopperProduct,
+    sanjiProduct,
+    namiProduct,
+  ]);
 
   const warning = () => {
     Modal.warning({
@@ -63,27 +71,26 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
   };
 
   const handleAddToCart = async (id: number) => {
-    await ApiHelper({
+    const { ok, error } = await commonApi({
       method: "POST",
       url: `http://localhost:8081/cart/add-item`,
-      data: JSON.stringify({
+      body: JSON.stringify({
         cartId: 1,
         productId: id,
         quantity: 1,
       }),
-    }).then((res) => {
-      if (res.status === 401) {
-        warning();
-      }
-      if (res.cartId) {
-        dispatch(setStep(Math.random()));
-        toast("Add item to cart successfully", {
-          hideProgressBar: true,
-          autoClose: 1000,
-          type: "success",
-        });
-      }
     });
+    if (ok) {
+      dispatch(setStep(Math.random()));
+      toast("Add item to cart successfully", {
+        hideProgressBar: true,
+        autoClose: 1000,
+        type: "success",
+      });
+    }
+    if (error) {
+      warning();
+    }
   };
 
   return (

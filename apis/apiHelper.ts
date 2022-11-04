@@ -30,7 +30,6 @@ export function ApiHelper(data: ApiStruct) {
         return result;
       },
       (error) => {
-        console.log("check error", error);
         error = error;
       }
     );

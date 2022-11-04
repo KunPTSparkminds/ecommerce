@@ -1,12 +1,23 @@
 import { Pagination } from "antd";
+import { url } from "inspector";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import commonApi from "../../apis/commonApi";
 import ProductFilterForm from "../../components/products/ProductFilterForm";
 import { Category, Product } from "../../models";
+import { parseParamUrl } from "../../utils/parseParamUrl";
 
 interface ProductProps {}
+interface ObjFilter {
+  page: number;
+  categoryId?: number;
+}
 const optionsPrice: { key: number; value: string }[] = [
+  {
+    key: 0,
+    value: "All",
+  },
   {
     key: 1,
     value: "100.000 VND - 200.000 VND",
@@ -22,67 +33,91 @@ const optionsPrice: { key: number; value: string }[] = [
 ];
 const Product: React.FunctionComponent<ProductProps> = (props) => {
   const router = useRouter();
+
   const [products, setProducts] = useState<Product[]>();
   const [optionsCategory, setOptionsCategory] =
     useState<{ key: number; value: string }[]>();
   const [total, setTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [dataFilter, setDataFilter] = useState<ObjFilter>({
+    page: 0,
+  });
 
   useEffect(() => {
-    getProducts();
-  }, [currentPage]);
+    const cloneFilter = (({ page, ...o }) => o)(dataFilter);
+    const clonePrevFilter = (({ page, ...x }) => x)(prevDataFilter);
+    if (JSON.stringify(cloneFilter) !== JSON.stringify(clonePrevFilter)) {
+      if (currentPage === 0) {
+        getProducts(dataFilter);
+      } else {
+        setCurrentPage(0);
+        setDataFilter({
+          ...dataFilter,
+          page: 0,
+        });
+      }
+    } else {
+      getProducts(dataFilter);
+    }
+  }, [dataFilter]);
 
   useEffect(() => {
     getCategories();
   }, []);
 
-  const getProducts = async () => {
-    let url = new URL("http://localhost:8081/api/product");
-    url.searchParams.append("page", currentPage.toString());
-    await fetch(url, {
+  const getProducts = async (dataFilter: ObjFilter) => {
+    const { body, total } = await commonApi({
+      url: parseParamUrl({
+        param: dataFilter,
+        url: "http://localhost:8081/api/product",
+      }),
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Expose-Headers": "*",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) return;
-        if (res?.headers?.get("x-total-count")) {
-          setTotal(parseInt(res.headers.get("x-total-count") as string));
-        }
-        return res.json();
-      })
-      .then((data) => setProducts(data));
+    });
+    if (typeof total === "number") {
+      setTotal(total);
+    }
+    if (body) {
+      setProducts(body);
+    }
   };
+
   const getCategories = async () => {
-    await fetch("http://localhost:8081/api/category", {
+    const { body } = await commonApi({
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return;
-        }
-        return response.json();
-      })
-      .then((data) =>
-        setOptionsCategory(
-          data.map((item: Category) => ({
-            key: item.id,
-            value: item.name,
-          }))
-        )
-      );
+      url: "http://localhost:8081/api/category",
+    });
+    if (body) {
+      const allOptions = [{ key: 0, value: "All" }];
+      body.map((item: Category) => {
+        const obj = {
+          key: item.id,
+          value: item.name,
+        };
+        allOptions.push(obj);
+      });
+      setOptionsCategory(allOptions);
+    }
   };
 
   const handleChangePage = (page: number) => {
     setCurrentPage(page - 1);
+    setDataFilter({ ...dataFilter, page: page - 1 });
   };
+  const handleChangeChamp = (value: number) => {
+    setDataFilter({
+      ...dataFilter,
+      categoryId: parseInt(value.toString()) ? value : undefined,
+    });
+  };
+
+  const FindPreviousState = (value: ObjFilter) => {
+    const ref = useRef({} as ObjFilter);
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  };
+  const prevDataFilter = FindPreviousState(dataFilter);
 
   return (
     <div className="products">
@@ -90,6 +125,7 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
         <ProductFilterForm
           optionsChamp={optionsCategory || []}
           optionsPrice={optionsPrice}
+          handleChangeChamp={handleChangeChamp}
         />
       </div>
       <div className="products__items">

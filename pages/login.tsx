@@ -1,14 +1,14 @@
 import { Button, Form, Input } from "antd";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { toast } from "react-toastify";
-import { ApiHelper } from "../apis/apiHelper";
+import { useAppDispatch } from "../hooks/hooks";
+import { setIsLoggedIn } from "../redux/slice/authSlice";
+
 interface LoginProps {}
 
 const Login: React.FunctionComponent<LoginProps> = (props) => {
-  const router = useRouter();
-  const [jwt, setJWT] = useState<{ jwtToken: string }>();
+  const dispatch = useAppDispatch();
 
   const onFinish = (values: any) => {
     fetch("http://localhost:8081/api/login", {
@@ -26,9 +26,9 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
       })
       .then((data) => {
         if (data?.jwtToken) {
+          dispatch(setIsLoggedIn(true));
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("jwt", data.jwtToken);
-          setJWT(data.jwtToken);
         }
       })
       .catch((error) => {
@@ -40,25 +40,6 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
           });
         });
       });
-  };
-
-  useEffect(() => {
-    if (jwt) {
-      getUserDetail();
-    }
-  }, [jwt]);
-
-  const getUserDetail = () => {
-    ApiHelper({
-      url: "http://localhost:8081/api/user-detail",
-      method: "GET",
-    }).then((data) => {
-      if (data?.role) {
-        router.push("/admin");
-      } else {
-        router.push("/");
-      }
-    });
   };
 
   return (

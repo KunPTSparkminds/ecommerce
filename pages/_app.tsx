@@ -27,8 +27,8 @@ function MyApp({ Component, pageProps }: MyAppProps) {
     default:
       return (
         <Provider store={store}>
+          <LoadUserDetail />
           <ClientLayout>
-            <LoadUserDetail />
             <Component {...pageProps} />
             <ToastContainer />
           </ClientLayout>

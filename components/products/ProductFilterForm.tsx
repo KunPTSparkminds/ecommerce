@@ -9,20 +9,22 @@ interface OptionsItem {
 interface ProductFilterFormProps {
   optionsChamp: OptionsItem[];
   optionsPrice: OptionsItem[];
+  handleChangeChamp: (value: number) => void;
 }
 
 const ProductFilterForm: React.FunctionComponent<ProductFilterFormProps> = ({
   optionsChamp,
   optionsPrice,
+  handleChangeChamp,
 }) => {
   const { Option } = Select;
   return (
     <div className="products__filter__form">
       <div className="select-champ">
         <span>Champion</span>
-        <Select placeholder="Select your champion">
-          {optionsChamp.map((item, index) => (
-            <Option key={index}>{item.value}</Option>
+        <Select placeholder="Select your champion" onChange={handleChangeChamp}>
+          {optionsChamp.map((item) => (
+            <Option key={item.key}>{item.value}</Option>
           ))}
         </Select>
       </div>
