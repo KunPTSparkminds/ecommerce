@@ -1,7 +1,8 @@
 import type { InferGetServerSidePropsType } from "next";
-import Banner from "../components/clientLayout/Banner";
+import Banner from "../components/layout/clientLayout/Banner";
 import SectionOne from "../components/landing/section-1";
 import SectionTwo from "../components/landing/section-2";
+import SectionThree from "../components/landing/section-3";
 
 export const getServerSideProps = async () => {
   const getAllProducts = async () => {
@@ -88,6 +89,7 @@ const Home = ({
         sanjiProduct={sanjiProduct}
       />
       <SectionTwo listProduct={listProduct} />
+      <SectionThree />
     </>
   );
 };

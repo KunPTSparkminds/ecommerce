@@ -12,6 +12,8 @@ interface ProductProps {}
 interface ObjFilter {
   page: number;
   categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
 }
 const optionsPrice: { key: number; value: string }[] = [
   {
@@ -109,7 +111,33 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
       categoryId: parseInt(value.toString()) ? value : undefined,
     });
   };
-
+  const handleChangePrice = (value: number) => {
+    switch (parseInt(value.toString())) {
+      case 0:
+        setDataFilter({
+          ...dataFilter,
+          minPrice: undefined,
+          maxPrice: undefined,
+        });
+        break;
+      case 1:
+        setDataFilter({
+          ...dataFilter,
+          minPrice: 100000,
+          maxPrice: 200000,
+        });
+        break;
+      case 2:
+        setDataFilter({
+          ...dataFilter,
+          minPrice: 200000,
+          maxPrice: 300000,
+        });
+        break;
+      default:
+        break;
+    }
+  };
   const FindPreviousState = (value: ObjFilter) => {
     const ref = useRef({} as ObjFilter);
     useEffect(() => {
@@ -126,6 +154,7 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
           optionsChamp={optionsCategory || []}
           optionsPrice={optionsPrice}
           handleChangeChamp={handleChangeChamp}
+          handleChangePrice={handleChangePrice}
         />
       </div>
       <div className="products__items">

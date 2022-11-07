@@ -1,7 +1,7 @@
 import { Card, Layout } from "antd";
 import * as React from "react";
-import HeaderAdmin from "../adminLayout/Header";
-import Sider from "../adminLayout/Sider";
+import HeaderAdmin from "./adminLayout/Header";
+import Sider from "./adminLayout/Sider";
 
 interface AdminLayoutProps {
   children: React.ReactNode;

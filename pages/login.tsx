@@ -1,5 +1,6 @@
 import { Button, Form, Input } from "antd";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "../hooks/hooks";
@@ -8,6 +9,7 @@ import { setIsLoggedIn } from "../redux/slice/authSlice";
 interface LoginProps {}
 
 const Login: React.FunctionComponent<LoginProps> = (props) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
 
   const onFinish = (values: any) => {
@@ -29,6 +31,7 @@ const Login: React.FunctionComponent<LoginProps> = (props) => {
           dispatch(setIsLoggedIn(true));
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("jwt", data.jwtToken);
+          router.push("/");
         }
       })
       .catch((error) => {

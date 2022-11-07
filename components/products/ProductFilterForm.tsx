@@ -10,11 +10,13 @@ interface ProductFilterFormProps {
   optionsChamp: OptionsItem[];
   optionsPrice: OptionsItem[];
   handleChangeChamp: (value: number) => void;
+  handleChangePrice: (value: number) => void;
 }
 
 const ProductFilterForm: React.FunctionComponent<ProductFilterFormProps> = ({
   optionsChamp,
   optionsPrice,
+  handleChangePrice,
   handleChangeChamp,
 }) => {
   const { Option } = Select;
@@ -30,7 +32,7 @@ const ProductFilterForm: React.FunctionComponent<ProductFilterFormProps> = ({
       </div>
       <div className="select-price">
         <span>Price</span>
-        <Select placeholder="Select your price">
+        <Select placeholder="Select your price" onChange={handleChangePrice}>
           {optionsPrice.map((item, index) => (
             <Option key={index}>{item.value}</Option>
           ))}

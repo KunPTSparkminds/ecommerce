@@ -1,0 +1,24 @@
+.section-3 {
+    padding-top: 0px !important;
+    padding: 100px;
+    width: 900px;
+    margin: 0 auto;
+    text-align: center;
+
+    .ant-input-group-wrapper {
+        .ant-input-wrapper {
+            height: 40px;
+            .ant-input {
+                height: 100%;
+            }
+            .ant-input-group-addon {
+                background-color: #606060;
+                span {
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+}

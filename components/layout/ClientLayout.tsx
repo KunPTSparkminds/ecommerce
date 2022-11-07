@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Layout } from "antd";
-import Header from "../clientLayout/Header";
-import Footer from "../clientLayout/Footer";
+import Header from "./clientLayout/Header";
+import Footer from "./clientLayout/Footer";
 interface ClientLayoutProps {
   children: React.ReactNode;
 }

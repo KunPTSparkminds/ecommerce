@@ -16,6 +16,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailProps> = (props) => {
   const router = useRouter();
   const [product, setProduct] = useState<Product>();
   const [quantityBuy, setQuantityBuy] = useState<number>(1);
+
   const getDetailProduct = async (id: any) => {
     await fetch(`http://localhost:8081/api/product/${id}`)
       .then((response) => {
@@ -36,6 +37,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailProps> = (props) => {
       getDetailProduct(router.query.id);
     }
   }, [router.query?.id]);
+
   const onChange = (value: any) => {
     if (value) {
       setQuantityBuy(value);

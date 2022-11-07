@@ -10,11 +10,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import commonApi from "../../apis/commonApi";
-import { useAppSelector } from "../../hooks/hooks";
-import { CartItem } from "../../models";
-import { isLoggedIn } from "../../redux/slice/authSlice";
-import { selectStep } from "../../redux/slice/cartSlice";
+import commonApi from "../../../apis/commonApi";
+import { useAppSelector } from "../../../hooks/hooks";
+import { CartItem } from "../../../models";
+import { isLoggedIn } from "../../../redux/slice/authSlice";
+import { selectStep } from "../../../redux/slice/cartSlice";
 
 interface HeaderProps {}
 

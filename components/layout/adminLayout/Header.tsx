@@ -1,7 +1,7 @@
 import { Button, Collapse, Dropdown, Layout, Menu, Popover } from "antd";
 import * as React from "react";
-import { useAppSelector } from "../../hooks/hooks";
-import { selectCurrentUser } from "../../redux/slice/authSlice";
+import { useAppSelector } from "../../../hooks/hooks";
+import { selectCurrentUser } from "../../../redux/slice/authSlice";
 import { UserOutlined, DownOutlined } from "@ant-design/icons";
 interface HeaderAdminProps {}
 
