@@ -9,6 +9,9 @@ import ModalCreate from "../../components/admin/Product/ModalCreate";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { TableCommon } from "../../shared/Table/TableCommon";
+import commonApi, { BASE_URL } from "../../apis/commonApi";
+import { Toast } from "../../components";
+import { parseParamUrl } from "../../utils/parseParamUrl";
 interface ProductProps {}
 interface DataFilter {
   page: number;
@@ -150,76 +153,46 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
   );
 
   const getProducts = async () => {
-    let url = new URL("http://localhost:8081/api/product");
-    const cloneDataFilter: any = { ...dataFilter };
-    for (let k in cloneDataFilter) {
-      url.searchParams.append(k, cloneDataFilter[k]);
-    }
-    await fetch(url, {
+    const { body, total } = await commonApi({
+      url: parseParamUrl({
+        param: dataFilter,
+        url: `${BASE_URL}api/product`,
+      }).split(BASE_URL)[1],
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Expose-Headers": "*",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((response) => {
-        if (response?.headers?.get("x-total-count")) {
-          setTotalRecord(
-            parseInt(response.headers.get("x-total-count") as string)
-          );
-        }
-        return response.json();
-      })
-      .then((data) =>
-        setProducts(
-          data.map((item: Product, index: number) => ({
-            no: index + 1,
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            quantity: item.quantity,
-            price: item.price,
-            categoryId: item.categoryId,
-            createdAt: item.createdAt,
-            updatedAt: item.updateAt,
-            image: item.image,
-            action: item.id,
-          }))
-        )
+    });
+    setTotalRecord(total || 0);
+    if (body) {
+      setProducts(
+        body.map((item: Product, index: number) => ({
+          no: index + 1,
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          quantity: item.quantity,
+          price: item.price,
+          categoryId: item.categoryId,
+          createdAt: item.createdAt,
+          updatedAt: item.updateAt,
+          image: item.image,
+          action: item.id,
+        }))
       );
+    }
   };
 
   const getCategories = async () => {
-    await fetch("http://localhost:8081/api/category", {
+    const { body } = await commonApi({
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject(response);
-      })
-      .then((data) =>
-        setOptionsCategory(
-          data.map((item: Category) => ({
-            key: item.id,
-            label: item.name,
-          }))
-        )
-      );
-  };
-
-  const toastMessage = (message: string) => {
-    return toast(message, {
-      hideProgressBar: true,
-      autoClose: 1000,
-      type: "success",
+      url: "api/category",
     });
+    if (body) {
+      setOptionsCategory(
+        body.map((item: Category) => ({
+          key: item.id,
+          label: item.name,
+        }))
+      );
+    }
   };
 
   const handleCancel = () => {
@@ -234,48 +207,34 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
   const handleEdit = async (id: number) => {
     setIsModalOpen(!isModalOpen);
     setType("update");
-    await fetch(`http://localhost:8081/api/product/${id}`, {
+    const { body } = await commonApi({
+      url: `api/product/${id}`,
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setProductDetail(data);
-        router.push(`/admin/product?id=${id}`);
-      });
+    });
+    if (body) {
+      setProductDetail(body);
+      router.push(`/admin/product?id=${id}`);
+    }
   };
 
   const handleDelete = async (id: number) => {
-    await fetch(`http://localhost:8081/api/product/${id}`, {
+    const { ok } = await commonApi({
+      url: `api/product/${id}`,
       method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    }).then((response) => {
-      if (response?.status === 204) {
-        setIndex(Math.random());
-        toastMessage("Delete successfull");
-      }
     });
+    if (ok) {
+      setIndex(Math.random());
+      Toast({
+        message: "Delete successfull",
+        type: "success",
+      });
+    }
   };
 
   const onSubmit = async (values: any) => {
-    await fetch("http://localhost:8081/api/product", {
+    const { body } = await commonApi({
+      url: "api/product",
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
       body: JSON.stringify({
         name: values.name,
         description: values.description,
@@ -284,27 +243,22 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
         categoryId: values.categoryId,
         image: base64String,
       }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (Object.keys(data).length > 0) {
-          form.resetFields();
-          setIsModalOpen(false);
-          toastMessage("Create product successfully");
-          setIndex(Math.random());
-        }
+    });
+    if (body) {
+      form.resetFields();
+      setIsModalOpen(false);
+      Toast({
+        message: "Create product successfully",
+        type: "success",
       });
+      setIndex(Math.random());
+    }
   };
 
   const handleUpdate = async (values: any) => {
-    await fetch(`http://localhost:8081/api/product/${router.query.id}`, {
+    const { ok } = await commonApi({
+      url: `api/product/${router.query.id}`,
       method: "PUT",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
       body: JSON.stringify({
         name: values.name,
         description: values.description,
@@ -313,15 +267,17 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
         categoryId: values.categoryId,
         image: base64String,
       }),
-    }).then((response) => {
-      if (response.status === 200) {
-        form.resetFields();
-        setIsModalOpen(false);
-        router.push("/admin/product");
-        toastMessage("Update successfully");
-        setIndex(Math.random());
-      }
     });
+    if (ok) {
+      form.resetFields();
+      setIsModalOpen(false);
+      router.push("/admin/product");
+      Toast({
+        message: "Update successfully",
+        type: "success",
+      });
+      setIndex(Math.random());
+    }
   };
   const handleChangePage = async (page: number) => {
     setPage(page);

@@ -1,8 +1,11 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Table } from "antd";
+import { Button, Modal, Table } from "antd";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import commonApi from "../apis/commonApi";
+import { Toast } from "../components";
+import ModalCheckout from "../components/cart/ModalCheckout";
 import { useAppDispatch } from "../hooks/hooks";
 import { CartItem } from "../models";
 import { setStep } from "../redux/slice/cartSlice";
@@ -13,6 +16,7 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
 
   const [data, setData] = useState<CartItem[]>();
   const [index, setIndex] = useState<number>(Math.random());
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getItemCart();
@@ -83,111 +87,99 @@ const Cart: React.FunctionComponent<CartProps> = (props) => {
   );
 
   const handleDelete = async (id: number) => {
-    await fetch(`http://localhost:8081/cart/${id}`, {
+    const { ok } = await commonApi({
+      url: `cart/${id}`,
       method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    }).then((res) => {
-      if (res.status === 204) {
-        setIndex(Math.random());
-        dispatch(setStep(Math.random()));
-        toast("Delete successfully", {
-          hideProgressBar: true,
-          autoClose: 1000,
-          type: "success",
-        });
-      }
     });
+    if (ok) {
+      setIndex(Math.random());
+      dispatch(setStep(Math.random()));
+      toast("Delete successfully", {
+        hideProgressBar: true,
+        autoClose: 1000,
+        type: "success",
+      });
+    }
   };
 
   const getItemCart = async () => {
-    await fetch(`http://localhost:8081/api/cart/1`, {
+    const { ok, body } = await commonApi({
+      url: "api/cart/1",
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        if (data[0]?.cartId) {
-          setData(data);
-        } else {
-          setData([]);
-        }
-      });
+    });
+    if (!ok) {
+      setData([]);
+    }
+    setData(body);
   };
 
   const handleRemoveAll = async () => {
-    await fetch(`http://localhost:8081/cart?cartId=1`, {
+    const { ok } = await commonApi({
+      url: `cart?cartId=1`,
       method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    }).then((res) => {
-      if (res.status === 204) {
-        toast("Delete all successfully", {
-          hideProgressBar: true,
-          autoClose: 1000,
-          type: "success",
-        });
-        setIndex(Math.random());
-      }
     });
+    if (ok) {
+      Toast({
+        message: "Delete all successfully",
+        type: "success",
+      });
+      setIndex(Math.random());
+    }
   };
 
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   return (
-    <div className="cart">
-      <div
-        className="cart__options"
-        style={{
-          textAlign: "right",
-          padding: "10px",
-        }}
-      >
-        <span onClick={() => handleRemoveAll()}>Remove all</span>
+    <>
+      <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <ModalCheckout />
+      </Modal>
+      <div className="cart">
+        <div
+          className="cart__options"
+          style={{
+            textAlign: "right",
+            padding: "10px",
+          }}
+        >
+          <span onClick={() => handleRemoveAll()}>Remove all</span>
+        </div>
+        <div className="cart__table">
+          <Table
+            columns={columns}
+            dataSource={data}
+            bordered
+            pagination={{ pageSize: 999 }}
+          />
+        </div>
+        <div className="cart__total">
+          {data && data.length > 0 && (
+            <div className="total">
+              <span>{`Total ${data.reduce(
+                (prev, curr) => prev + curr.quantity,
+                0
+              )} items:`}</span>
+              <span>
+                {data
+                  .reduce((prev, curr) => prev + curr.price, 0)
+                  .toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="cart__btn-checkout">
+          <Button onClick={() => setIsModalOpen(!isModalOpen)}>Checkout</Button>
+        </div>
       </div>
-      <div className="cart__table">
-        <Table
-          columns={columns}
-          dataSource={data}
-          bordered
-          pagination={{ pageSize: 999 }}
-        />
-      </div>
-      <div className="cart__total">
-        {data && data.length > 0 && (
-          <div className="total">
-            <span>{`Total ${data.reduce(
-              (prev, curr) => prev + curr.quantity,
-              0
-            )} items:`}</span>
-            <span>
-              {data
-                .reduce((prev, curr) => prev + curr.price, 0)
-                .toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="cart__btn-checkout">
-        <Button>Checkout</Button>
-      </div>
-    </div>
+    </>
   );
 };
 

@@ -9,12 +9,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import commonApi from "../../../apis/commonApi";
 import { useAppSelector } from "../../../hooks/hooks";
 import { CartItem } from "../../../models";
 import { isLoggedIn } from "../../../redux/slice/authSlice";
 import { selectStep } from "../../../redux/slice/cartSlice";
+import { Toast } from "../../toasts/Toast";
 
 interface HeaderProps {}
 
@@ -24,7 +24,6 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
   const router = useRouter();
 
   const [data, setData] = useState<CartItem[]>();
-  const [error, setError] = useState<{ status: number; title: string }>();
   const [index, setIndex] = useState<number>(Math.random());
 
   const resultAddItem = useAppSelector(selectStep);
@@ -37,29 +36,24 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
   }, [index, resultAddItem, isLogged]);
 
   const getItems = async () => {
-    const { body, error } = await commonApi({
-      url: "http://localhost:8081/api/cart/1",
+    const { body } = await commonApi({
+      url: "api/cart/1",
       method: "GET",
     });
     if (body) {
       setData(body);
-      setError(undefined);
-    }
-    if (error) {
-      setError(error);
     }
   };
 
   const handleDelete = async (id: number) => {
     const { ok } = await commonApi({
-      url: `http://localhost:8081/cart/${id}`,
+      url: `cart/${id}`,
       method: "DELETE",
     });
     if (ok) {
       setIndex(Math.random());
-      toast("Delete successfully", {
-        hideProgressBar: true,
-        autoClose: 1000,
+      Toast({
+        message: "Delete successfully",
         type: "success",
       });
     }
@@ -79,7 +73,7 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
   const handleLogOut = async () => {
     const { ok } = await commonApi({
       method: "POST",
-      url: "http://localhost:8081/api/logout",
+      url: "api/logout",
     });
     if (ok) {
       setIndex(Math.random());

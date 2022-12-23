@@ -73,7 +73,7 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
   const handleAddToCart = async (id: number) => {
     const { ok, error } = await commonApi({
       method: "POST",
-      url: `http://localhost:8081/cart/add-item`,
+      url: `cart/add-item`,
       body: JSON.stringify({
         cartId: 1,
         productId: id,

@@ -3,23 +3,32 @@ export interface ApiStruct {
   method: "GET" | "POST" | "PUT" | "DELETE";
   body?: any;
   filter?: Object;
+  isLoggedIn?: boolean;
+}
+
+interface Error {
+  status: number;
+  message: string;
 }
 interface ReponseApi {
   body?: any;
-  error?: any;
+  error?: Error;
   ok?: boolean;
   total?: number;
 }
+export const BASE_URL = "http://localhost:8082/";
 const commonApi = async (contruct: ApiStruct) => {
   const objResponse: ReponseApi = {};
 
-  const response = await fetch(contruct.url, {
+  const response = await fetch(`${BASE_URL}${contruct.url}`, {
     method: contruct.method,
     headers: {
       Accept: "application/json",
       "Access-Control-Allow-Credentials": "true",
       "Content-Type": "application/json;charset=UTF-8",
-      Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      Authorization: contruct.isLoggedIn
+        ? ""
+        : `Bearer ${localStorage.getItem("jwt")}`,
     },
     body: contruct.body,
   });
