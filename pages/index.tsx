@@ -3,6 +3,7 @@ import Banner from "../components/layout/clientLayout/Banner";
 import SectionOne from "../components/landing/section-1";
 import SectionTwo from "../components/landing/section-2";
 import SectionThree from "../components/landing/section-3";
+import SectionFour from "../components/landing/section-4";
 
 export const getServerSideProps = async () => {
   const getAllProducts = async () => {
@@ -89,6 +90,7 @@ const Home = ({
         sanjiProduct={sanjiProduct}
       />
       <SectionTwo listProduct={listProduct} />
+      <SectionFour />
       <SectionThree />
     </>
   );
