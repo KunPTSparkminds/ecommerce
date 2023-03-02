@@ -11,5 +11,5 @@ export const parseParamUrl = (params: ParamsUrl) => {
         url.searchParams.append(key[0], key[1]);
       });
   }
-  return url as unknown as string;
+  return url.href;
 };

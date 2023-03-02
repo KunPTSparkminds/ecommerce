@@ -3,7 +3,7 @@ import { url } from "inspector";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
-import commonApi from "../../apis/commonApi";
+import commonApi, { BASE_URL } from "../../apis/commonApi";
 import ProductFilterForm from "../../components/products/ProductFilterForm";
 import { Category, Product } from "../../models";
 import { parseParamUrl } from "../../utils/parseParamUrl";
@@ -71,8 +71,8 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
     const { body, total } = await commonApi({
       url: parseParamUrl({
         param: dataFilter,
-        url: "http://localhost:8081/api/product",
-      }),
+        url: `${BASE_URL}api/product`,
+      }).split(BASE_URL)[1],
       method: "GET",
     });
     if (typeof total === "number") {
@@ -86,7 +86,7 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
   const getCategories = async () => {
     const { body } = await commonApi({
       method: "GET",
-      url: "http://localhost:8081/api/category",
+      url: "api/category",
     });
     if (body) {
       const allOptions = [{ key: 0, value: "All" }];

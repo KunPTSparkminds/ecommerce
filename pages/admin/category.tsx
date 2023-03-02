@@ -4,7 +4,8 @@ import date from "date-and-time";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import commonApi from "../../apis/commonApi";
+import { Toast } from "../../components";
 import ModalCreate from "../../components/admin/Category/ModalCreate";
 import { DATE_TIME_FORMAT } from "../../consts";
 import { Category } from "../../models";
@@ -28,32 +29,23 @@ const Category: React.FunctionComponent<CategoryProps> = (props) => {
   }, [index]);
 
   const getCategories = async () => {
-    await fetch("http://localhost:8081/api/category", {
+    const { body } = await commonApi({
+      url: "api/category",
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject(response);
-      })
-      .then((data) =>
-        setCategory(
-          data.map((item: Category) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            createdAt: item.createdAt,
-            updatedAt: item.updateAt,
-            image: item.image,
-            action: item.id,
-          }))
-        )
+    });
+    if (body) {
+      setCategory(
+        body.map((item: Category) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          createdAt: item.createdAt,
+          updatedAt: item.updateAt,
+          image: item.image,
+          action: item.id,
+        }))
       );
+    }
   };
 
   const onGetBase64 = (value: string) => {
@@ -143,99 +135,74 @@ const Category: React.FunctionComponent<CategoryProps> = (props) => {
     setIsModalOpen(false);
   };
 
-  const toastMessage = (message: string) => {
-    return toast(message, {
-      hideProgressBar: true,
-      autoClose: 1000,
-      type: "success",
-    });
-  };
-
   const handleDelete = async (id: number) => {
-    await fetch(`http://localhost:8081/api/category/${id}`, {
+    const { ok } = await commonApi({
+      url: `api/category/${id}`,
       method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    }).then((response) => {
-      if (response?.status === 204) {
-        setIndex(Math.random());
-        toastMessage("Delete successfull");
-      }
     });
+    if (ok) {
+      setIndex(Math.random());
+      Toast({
+        message: "Delete successfull",
+        type: "success",
+      });
+    }
   };
 
   const handleEdit = async (id: number) => {
     setIsModalOpen(!isModalOpen);
     setType("update");
-    await fetch(`http://localhost:8081/api/category/${id}`, {
+    const { body } = await commonApi({
+      url: `api/category/${id}`,
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setCategoryDetail(data);
-        router.push(`/admin/category?id=${id}`);
-      });
+    });
+    if (body) {
+      setCategoryDetail(body);
+      router.push(`/admin/category?id=${id}`);
+    }
   };
 
   const onSubmit = async (values: any) => {
-    await fetch("http://localhost:8081/api/category/create", {
+    const { body } = await commonApi({
+      url: "api/category/create",
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
       body: JSON.stringify({
         name: values.name,
         description: values.description,
         image: base64String,
       }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (Object.keys(data).length > 0) {
-          form.resetFields();
-          setIsModalOpen(false);
-          toastMessage("Create category successfully");
-          setIndex(Math.random());
-        }
+    });
+    if (body) {
+      form.resetFields();
+      setIsModalOpen(false);
+      Toast({
+        message: "Create category successfully",
+        type: "success",
       });
+      setIndex(Math.random());
+    }
   };
 
   const handleUpdate = async (values: any) => {
-    await fetch(`http://localhost:8081/api/category/${router.query.id}`, {
+    const { ok } = await commonApi({
+      url: `api/category/${router.query.id}`,
       method: "PUT",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
       body: JSON.stringify({
         name: values.name,
         description: values.description,
         image: base64String,
       }),
-    }).then((response) => {
-      if (response.status === 200) {
-        form.resetFields();
-        setIsModalOpen(false);
-        router.push("/admin/category");
-        toastMessage("Update successfully");
-        setIndex(Math.random());
-      }
     });
+    if (ok) {
+      form.resetFields();
+      setIsModalOpen(false);
+      router.push("/admin/category");
+      Toast({
+        message: "Update successfully",
+        type: "success",
+      });
+      setIndex(Math.random());
+    }
   };
 
   return (

@@ -4,12 +4,20 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import commonApi from "../../apis/commonApi";
 import { DATE_TIME_FORMAT } from "../../consts";
 import { useAppDispatch } from "../../hooks/hooks";
 import { Product } from "../../models";
 import { setStep } from "../../redux/slice/cartSlice";
 
 interface ProductDetailProps {}
+
+export const warning = () => {
+  Modal.warning({
+    title: "Add item failed",
+    content: "Please login to use this function",
+  });
+};
 
 const ProductDetail: React.FunctionComponent<ProductDetailProps> = (props) => {
   const dispatch = useAppDispatch();
@@ -18,18 +26,13 @@ const ProductDetail: React.FunctionComponent<ProductDetailProps> = (props) => {
   const [quantityBuy, setQuantityBuy] = useState<number>(1);
 
   const getDetailProduct = async (id: any) => {
-    await fetch(`http://localhost:8081/api/product/${id}`)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject(response);
-      })
-      .then((data) => {
-        if (data?.id) {
-          setProduct(data);
-        }
-      });
+    const { body } = await commonApi({
+      url: `api/product/${id}`,
+      method: "GET",
+    });
+    if (body?.id) {
+      setProduct(body);
+    }
   };
 
   useEffect(() => {
@@ -44,41 +47,29 @@ const ProductDetail: React.FunctionComponent<ProductDetailProps> = (props) => {
     }
   };
 
-  const warning = () => {
-    Modal.warning({
-      title: "Add item failed",
-      content: "Please login to use this function",
-    });
-  };
-
   const handleAddToCart = async (id: number) => {
-    await fetch(`http://localhost:8081/cart/add-item`, {
+    const { ok, error } = await commonApi({
+      url: `cart/add-item`,
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
       body: JSON.stringify({
         cartId: 1,
         productId: id,
         quantity: quantityBuy,
       }),
-    }).then((res) => {
-      if (res.status === 401) {
-        warning();
-      }
-      if (res.ok) {
-        dispatch(setStep(Math.random()));
-        toast("Add item to cart successfully", {
-          hideProgressBar: true,
-          autoClose: 1000,
-          type: "success",
-        });
-      }
     });
+    if (error?.status) {
+      warning();
+    }
+    if (ok) {
+      dispatch(setStep(Math.random()));
+      toast("Add item to cart successfully", {
+        hideProgressBar: true,
+        autoClose: 1000,
+        type: "success",
+      });
+    }
   };
+
   return (
     <div className="product-detail">
       {product && Object.keys(product).length > 0 ? (

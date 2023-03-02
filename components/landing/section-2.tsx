@@ -23,6 +23,7 @@ const SectionTwo: React.FunctionComponent<SectionTwoProps> = ({
     autoplaySpeed: 2000,
     cssEase: "linear",
   };
+  console.log("listProduct", listProduct)
   return (
     <div className="section-2">
       <h1>{`What's news at Kun's Shop?`}</h1>

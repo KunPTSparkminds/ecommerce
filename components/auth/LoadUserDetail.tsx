@@ -20,7 +20,7 @@ const LoadUserDetail: React.FunctionComponent<LoadUserDetailProps> = (
     (async () => {
       const { body } = await commonApi({
         method: "GET",
-        url: "http://localhost:8081/api/user-detail",
+        url: "api/user-detail",
       });
       if (body) {
         dispatch(setIsLoggedIn(true));
