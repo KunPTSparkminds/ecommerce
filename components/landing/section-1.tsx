@@ -89,6 +89,7 @@ const SectionOne: React.FunctionComponent<SectionOneProps> = ({
       });
     }
     if (error) {
+      console.log("check eorr", error);
       warning();
     }
   };

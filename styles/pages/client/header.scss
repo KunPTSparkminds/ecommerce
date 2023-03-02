@@ -5,6 +5,9 @@
   right: 0;
   z-index: 99;
   .header__wrap {
+    @include mobile {
+      display: none;
+    }
     &__top {
       padding-top: 40px;
       display: flex;

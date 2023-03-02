@@ -16,7 +16,9 @@ interface ReponseApi {
   ok?: boolean;
   total?: number;
 }
-export const BASE_URL = "http://localhost:8082/";
+
+export const BASE_URL = "http://localhost:8081/";
+
 const commonApi = async (contruct: ApiStruct) => {
   const objResponse: ReponseApi = {};
 

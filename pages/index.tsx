@@ -5,6 +5,8 @@ import SectionTwo from "../components/landing/section-2";
 import SectionThree from "../components/landing/section-3";
 import { BASE_URL } from "../apis/commonApi";
 import Head from "next/head";
+import SectionFour from "../components/landing/section-4";
+import { useWindowSize } from "../hooks/hooks";
 
 export const getServerSideProps = async () => {
   const getAllProducts = async () => {
@@ -85,8 +87,9 @@ const Home = ({
         namiProduct={namiProduct}
         sanjiProduct={sanjiProduct}
       />
-      <SectionTwo listProduct={listProduct} />
-      <SectionThree />
+      {/* <SectionTwo listProduct={listProduct} /> */}
+      <SectionFour />
+      {/* <SectionThree /> */}
     </>
   );
 };

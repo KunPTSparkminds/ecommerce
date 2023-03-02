@@ -4,13 +4,13 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Input, Layout, Popover } from "antd";
+import { Button, Drawer, Input, Layout, Popover } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import commonApi from "../../../apis/commonApi";
-import { useAppSelector } from "../../../hooks/hooks";
+import { useAppSelector, useWindowSize } from "../../../hooks/hooks";
 import { CartItem } from "../../../models";
 import { isLoggedIn } from "../../../redux/slice/authSlice";
 import { selectStep } from "../../../redux/slice/cartSlice";
@@ -20,11 +20,13 @@ interface HeaderProps {}
 
 const Header: React.FunctionComponent<HeaderProps> = (props) => {
   const { Header } = Layout;
+  const size = useWindowSize();
 
   const router = useRouter();
 
   const [data, setData] = useState<CartItem[]>();
   const [index, setIndex] = useState<number>(Math.random());
+  const [open, setOpen] = useState(false);
 
   const resultAddItem = useAppSelector(selectStep);
   const isLogged = useAppSelector(isLoggedIn);
@@ -70,6 +72,7 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
         break;
     }
   };
+
   const handleLogOut = async () => {
     const { ok } = await commonApi({
       method: "POST",
@@ -79,146 +82,165 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
       setIndex(Math.random());
     }
   };
+
   return (
     <Header>
       <div className="header__wrap">
-        <div className="header__wrap__top">
-          <Input addonAfter={<SearchOutlined />} placeholder="Search here..." />
-          <h1>{`Kun's Shop`}</h1>
-          <div className="group-icon">
-            {!isLogged && (
-              <Link href="/login">
-                <a>
-                  <UserOutlined />
-                </a>
-              </Link>
-            )}
-            {isLogged && (
-              <Popover
-                placement="bottom"
-                content={
-                  <div
-                    className="account"
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      width: "90px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <Link href={"#"}>
-                      <a
+        {size && size <= 768 ? (
+          <Drawer
+            title="Basic Drawer"
+            placement="right"
+            open={open}
+            onClose={() => setOpen(false)}
+          >
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </Drawer>
+        ) : (
+          <>
+            <div className="header__wrap__top">
+              <Input
+                addonAfter={<SearchOutlined />}
+                placeholder="Search here..."
+              />
+              <h1>{`Kun's Shop`}</h1>
+              <div className="group-icon">
+                {!isLogged && (
+                  <Link href="/login">
+                    <a>
+                      <UserOutlined />
+                    </a>
+                  </Link>
+                )}
+                {isLogged && (
+                  <Popover
+                    placement="bottom"
+                    content={
+                      <div
+                        className="account"
                         style={{
-                          fontSize: "16px",
+                          display: "flex",
+                          flexDirection: "column",
+                          width: "90px",
+                          textAlign: "center",
                         }}
                       >
-                        Setting
-                      </a>
-                    </Link>
-                    <span
-                      style={{
-                        fontSize: "16px",
-                      }}
-                      onClick={() => handleLogOut()}
-                    >
-                      Log Out
-                    </span>
-                  </div>
-                }
-              >
-                <UserOutlined />
-              </Popover>
-            )}
-            <Popover
-              placement="bottom"
-              content={
-                !isLogged ? (
-                  <span>You must be login to use this function</span>
-                ) : (
-                  <div className="mini-cart">
-                    {data && data.length > 0 ? (
-                      data.map((item, index) => (
-                        <div className="mini-cart__wrap" key={index}>
-                          <div className="mini-cart__wrap__image">
-                            <Image
-                              alt=""
-                              src={item.image}
-                              width={60}
-                              height={60}
-                            />
-                          </div>
-                          <div className="mini-cart__wrap__product">
-                            <span>{item.productName}</span>
-                            <div className="price">
-                              <span>{`${item.quantity} x ${(
-                                item.price / item.quantity
-                              ).toLocaleString("en-US", {
-                                style: "currency",
-                                currency: "VND",
-                              })}`}</span>
-                              <span>
-                                {item.price.toLocaleString("en-US", {
+                        <Link href={"#"}>
+                          <a
+                            style={{
+                              fontSize: "16px",
+                            }}
+                          >
+                            Setting
+                          </a>
+                        </Link>
+                        <span
+                          style={{
+                            fontSize: "16px",
+                          }}
+                          onClick={() => handleLogOut()}
+                        >
+                          Log Out
+                        </span>
+                      </div>
+                    }
+                  >
+                    <UserOutlined />
+                  </Popover>
+                )}
+                <Popover
+                  placement="bottom"
+                  content={
+                    !isLogged ? (
+                      <span>You must be login to use this function</span>
+                    ) : (
+                      <div className="mini-cart">
+                        {data && data.length > 0 ? (
+                          data.map((item, index) => (
+                            <div className="mini-cart__wrap" key={index}>
+                              <div className="mini-cart__wrap__image">
+                                <Image
+                                  alt=""
+                                  src={item.image}
+                                  width={60}
+                                  height={60}
+                                />
+                              </div>
+                              <div className="mini-cart__wrap__product">
+                                <span>{item.productName}</span>
+                                <div className="price">
+                                  <span>{`${item.quantity} x ${(
+                                    item.price / item.quantity
+                                  ).toLocaleString("en-US", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}`}</span>
+                                  <span>
+                                    {item.price.toLocaleString("en-US", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="mini-cart__wrap__remove">
+                                <DeleteOutlined
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleDelete(item.id)}
+                                />
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <span>Empty cart</span>
+                        )}
+                        <div className="total">
+                          <span>Total</span>
+                          <span>
+                            {data &&
+                              data
+                                .reduce((prev, curr) => prev + curr.price, 0)
+                                .toLocaleString("en-US", {
                                   style: "currency",
                                   currency: "VND",
                                 })}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mini-cart__wrap__remove">
-                            <DeleteOutlined
-                              style={{ cursor: "pointer" }}
-                              onClick={() => handleDelete(item.id)}
-                            />
-                          </div>
+                          </span>
                         </div>
-                      ))
-                    ) : (
-                      <span>Empty cart</span>
-                    )}
-                    <div className="total">
-                      <span>Total</span>
-                      <span>
-                        {data &&
-                          data
-                            .reduce((prev, curr) => prev + curr.price, 0)
-                            .toLocaleString("en-US", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                      </span>
-                    </div>
-                    <div className="view-cart">
-                      <Button onClick={() => router.push("/cart")}>
-                        View cart
-                      </Button>
-                    </div>
+                        <div className="view-cart">
+                          <Button onClick={() => router.push("/cart")}>
+                            View cart
+                          </Button>
+                        </div>
+                      </div>
+                    )
+                  }
+                >
+                  <ShoppingCartOutlined
+                    className={
+                      data && data.reduce((prev, curr) => prev + curr.price, 0)
+                        ? "anticon-shopping-cart--has-item"
+                        : ""
+                    }
+                  />
+                </Popover>
+              </div>
+            </div>
+            <div className="header__wrap__bottom">
+              {["HOME", "PORTFOLIO", "BLOG", "SHOP", "PRODUCTS", "PAGES"].map(
+                (item, index) => (
+                  <div
+                    className="menu-item"
+                    key={index}
+                    onClick={() => handleClickMenu(item)}
+                  >
+                    <p>{item}</p>
                   </div>
                 )
-              }
-            >
-              <ShoppingCartOutlined
-                className={
-                  data && data.reduce((prev, curr) => prev + curr.price, 0)
-                    ? "anticon-shopping-cart--has-item"
-                    : ""
-                }
-              />
-            </Popover>
-          </div>
-        </div>
-        <div className="header__wrap__bottom">
-          {["HOME", "PORTFOLIO", "BLOG", "SHOP", "PRODUCTS", "PAGES"].map(
-            (item, index) => (
-              <div
-                className="menu-item"
-                key={index}
-                onClick={() => handleClickMenu(item)}
-              >
-                <p>{item}</p>
-              </div>
-            )
-          )}
-        </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </Header>
   );
